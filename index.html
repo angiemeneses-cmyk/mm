@@ -441,7 +441,7 @@
         <a href="https://www.flaticon.es/icono-gratis/corbata_2290551" target="_blank">
           <img src="https://cdn-icons-png.flaticon.com/512/2290/2290551.png" alt="Corbata" class="dress-icon">
         </a>
-        <p><strong>Ellos:</strong> Casual</p>
+        <p><strong>Ellos:</strong> Formal</p>
       </div>
 
       <div class="dress-item">
@@ -479,12 +479,28 @@
   <section class="form-section animate-in">
     <h2>Confirma tu Asistencia</h2>
     <div class="form-container">
-      <form action="mailto:mhinestrozatorres@gmail.com" method="POST" enctype="text/plain">
-        <input type="text" name="Nombre" placeholder="Tu nombre completo" required class="form-input">
-        <input type="text" name="Intolerancia/alergias" placeholder="Intolerancia/alergias" required class="form-input">
-        <input type="number" name="Acompañantes" placeholder="Número de acompañantes" min="0" class="form-input">
+      <form id="rsvpForm">
+        <input type="text" id="nombre" placeholder="Tu nombre completo" required class="form-input">
+        <input type="email" id="correo" placeholder="Tu correo electrónico" required class="form-input">
+        <input type="number" id="acompanantes" placeholder="Número de acompañantes" min="0" value="0" class="form-input">
         <button type="submit" class="btn" style="width:100%;">Confirmar Asistencia</button>
       </form>
+      <div id="successMessage" style="display:none; margin-top: 2rem; padding: 1rem; background: #d4edda; color: #155724; border-radius: 10px;">
+        ¡Gracias por confirmar! Nos vemos el 15 de noviembre ❤️
+      </div>
+    </div>
+  </section>
+
+  <section class="admin-section animate-in" style="background: #f8f8f8; padding: 4rem 2rem;">
+    <h2>Lista de Confirmados</h2>
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div id="guestList" style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+        <p style="text-align: center; color: #999;">Cargando confirmaciones...</p>
+      </div>
+      <div style="text-align: center; margin-top: 2rem;">
+        <button onclick="exportGuests()" class="btn" style="margin-right: 1rem;">📥 Exportar Lista</button>
+        <button onclick="clearAllGuests()" class="btn" style="background: linear-gradient(135deg, #dc3545, #c82333);">🗑️ Limpiar Todo</button>
+      </div>
     </div>
   </section>
 
@@ -561,6 +577,156 @@
     document.querySelectorAll('.animate-in').forEach(el => {
       observer.observe(el);
     });
+
+    // Sistema de confirmaciones con almacenamiento persistente
+    async function loadGuests() {
+      try {
+        const result = await window.storage.list('guest:', true);
+        const guestList = document.getElementById('guestList');
+        
+        if (!result || !result.keys || result.keys.length === 0) {
+          guestList.innerHTML = '<p style="text-align: center; color: #999;">Aún no hay confirmaciones.</p>';
+          return;
+        }
+
+        let totalGuests = 0;
+        let html = '<div style="margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem; color: var(--vino);"><strong>Total de confirmaciones: ' + result.keys.length + '</strong></div>';
+        
+        for (const key of result.keys) {
+          try {
+            const guestData = await window.storage.get(key, true);
+            if (guestData && guestData.value) {
+              const guest = JSON.parse(guestData.value);
+              totalGuests += 1 + (guest.acompanantes || 0);
+              html += `
+                <div style="border-bottom: 1px solid #f0f0f0; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: var(--vino);">${guest.nombre}</strong><br>
+                    <small style="color: #999;">${guest.correo}</small><br>
+                    <small>👥 ${guest.acompanantes || 0} acompañante(s) | 📅 ${new Date(guest.fecha).toLocaleDateString('es-ES')}</small>
+                  </div>
+                  <button onclick="deleteGuest('${key}')" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Eliminar</button>
+                </div>
+              `;
+            }
+          } catch (e) {
+            console.error('Error loading guest:', e);
+          }
+        }
+        
+        html = '<div style="margin-bottom: 1.5rem; text-align: center; font-size: 1.3rem; color: var(--vino); background: var(--beige); padding: 1rem; border-radius: 10px;"><strong>📊 Total de personas: ' + totalGuests + '</strong></div>' + html;
+        guestList.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading guests:', error);
+        document.getElementById('guestList').innerHTML = '<p style="text-align: center; color: #dc3545;">Error al cargar las confirmaciones.</p>';
+      }
+    }
+
+    async function deleteGuest(key) {
+      if (!confirm('¿Estás seguro de eliminar esta confirmación?')) return;
+      
+      try {
+        await window.storage.delete(key, true);
+        await loadGuests();
+      } catch (error) {
+        console.error('Error deleting guest:', error);
+        alert('Error al eliminar la confirmación');
+      }
+    }
+
+    async function clearAllGuests() {
+      if (!confirm('¿Estás seguro de eliminar TODAS las confirmaciones? Esta acción no se puede deshacer.')) return;
+      
+      try {
+        const result = await window.storage.list('guest:', true);
+        if (result && result.keys) {
+          for (const key of result.keys) {
+            await window.storage.delete(key, true);
+          }
+        }
+        await loadGuests();
+        alert('Todas las confirmaciones han sido eliminadas.');
+      } catch (error) {
+        console.error('Error clearing guests:', error);
+        alert('Error al eliminar las confirmaciones');
+      }
+    }
+
+    async function exportGuests() {
+      try {
+        const result = await window.storage.list('guest:', true);
+        if (!result || !result.keys || result.keys.length === 0) {
+          alert('No hay confirmaciones para exportar.');
+          return;
+        }
+
+        let csvContent = 'Nombre,Correo,Acompañantes,Fecha de Confirmación\n';
+        
+        for (const key of result.keys) {
+          try {
+            const guestData = await window.storage.get(key, true);
+            if (guestData && guestData.value) {
+              const guest = JSON.parse(guestData.value);
+              csvContent += `"${guest.nombre}","${guest.correo}",${guest.acompanantes || 0},"${new Date(guest.fecha).toLocaleDateString('es-ES')}"\n`;
+            }
+          } catch (e) {
+            console.error('Error exporting guest:', e);
+          }
+        }
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'confirmaciones_boda_margarita_harold.csv';
+        link.click();
+      } catch (error) {
+        console.error('Error exporting guests:', error);
+        alert('Error al exportar las confirmaciones');
+      }
+    }
+
+    // Manejo del formulario
+    document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const nombre = document.getElementById('nombre').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const acompanantes = parseInt(document.getElementById('acompanantes').value) || 0;
+      
+      if (!nombre || !correo) {
+        alert('Por favor completa todos los campos obligatorios.');
+        return;
+      }
+
+      const guestData = {
+        nombre,
+        correo,
+        acompanantes,
+        fecha: new Date().toISOString()
+      };
+
+      try {
+        const guestId = 'guest:' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        await window.storage.set(guestId, JSON.stringify(guestData), true);
+        
+        document.getElementById('rsvpForm').reset();
+        document.getElementById('successMessage').style.display = 'block';
+        
+        setTimeout(() => {
+          document.getElementById('successMessage').style.display = 'none';
+        }, 5000);
+        
+        await loadGuests();
+        
+        document.getElementById('guestList').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (error) {
+        console.error('Error saving guest:', error);
+        alert('Hubo un error al guardar tu confirmación. Por favor intenta nuevamente.');
+      }
+    });
+
+    // Cargar invitados al iniciar
+    loadGuests();
   </script>
 </body>
 </html>
