@@ -208,7 +208,7 @@
    </div>
   </section>
     
-  <section class="form-section animate-in">
+   <section class="form-section animate-in">
     <h2>Confirma tu Asistencia</h2>
     <div class="form-container">
       <form id="rsvpForm">
@@ -222,6 +222,35 @@
       </div>
     </div>
   </section>
+
+  <section class="admin-section animate-in" id="adminSection" style="background:#f8f8f8; padding:4rem 2rem; display:none;">
+    <h2>Panel de Administración</h2>
+    <div id="adminLogin" style="max-width:400px;margin:0 auto;">
+      <div style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+        <p style="text-align:center;margin-bottom:1.5rem;color:var(--gris);">Ingresa la contraseña para ver las confirmaciones</p>
+        <input type="password" id="adminPassword" placeholder="Contraseña" class="form-input">
+        <button onclick="checkPassword()" class="btn" style="width:100%;">🔐 Acceder</button>
+        <p id="loginError" style="color:#dc3545;text-align:center;margin-top:1rem;display:none;">Contraseña incorrecta</p>
+      </div>
+    </div>
+
+    <div id="adminContent" style="display:none;">
+      <div style="max-width:800px;margin:0 auto;">
+        <div style="text-align:right;margin-bottom:1rem;">
+          <button onclick="logout()" class="btn" style="background:linear-gradient(135deg,#6c757d,#5a6268);font-size:0.9rem;padding:0.6rem 1.5rem;">🚪 Cerrar sesión</button>
+        </div>
+        <div id="guestList" style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+          <p style="text-align:center;color:#999;">Cargando confirmaciones...</p>
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+          <button onclick="exportGuests()" class="btn" style="margin-right:1rem;">📥 Exportar Lista</button>
+          <button onclick="clearAllGuests()" class="btn" style="background:linear-gradient(135deg,#dc3545,#c82333);">🗑️ Limpiar Todo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <button class="admin-toggle-btn" onclick="toggleAdminSection()" title="Panel de administración">👤</button>
 
   <footer>
     <p>Con todo nuestro amor</p>
@@ -253,6 +282,83 @@
         <div><span>${pad(h)}</span><span>Horas</span></div>
         <div><span>${pad(m)}</span><span>Min</span></div>
         <div><span>${pad(s)}</span><span>Seg</span></div></div>`;},1000);
+
+    // ============= CONFIRMACIONES =============
+    let isLoggedIn=false;
+    const ADMIN_PASSWORD='margarita2025';
+    let guestsData=[];
+
+    function loadFromLocalStorage(){try{const s=localStorage.getItem('wedding_guests');guestsData=s?JSON.parse(s):[];}catch(e){guestsData=[];}}
+    function saveToLocalStorage(){localStorage.setItem('wedding_guests',JSON.stringify(guestsData));}
+
+    function toggleAdminSection(){
+      const s=document.getElementById('adminSection');
+      s.style.display=(s.style.display==='block'?'none':'block');
+      if(s.style.display==='block')s.scrollIntoView({behavior:'smooth'});
+    }
+
+    function checkPassword(){
+      const p=document.getElementById('adminPassword').value;
+      const e=document.getElementById('loginError');
+      if(p===ADMIN_PASSWORD){isLoggedIn=true;
+        document.getElementById('adminLogin').style.display='none';
+        document.getElementById('adminContent').style.display='block';e.style.display='none';loadGuests();
+      }else{e.style.display='block';document.getElementById('adminPassword').value='';}
+    }
+
+    function logout(){isLoggedIn=false;
+      document.getElementById('adminLogin').style.display='block';
+      document.getElementById('adminContent').style.display='none';
+      document.getElementById('adminSection').style.display='none';
+    }
+
+    function loadGuests(){
+      if(!isLoggedIn)return;
+      const list=document.getElementById('guestList');
+      if(!guestsData.length){list.innerHTML='<p style="text-align:center;color:#999;">Aún no hay confirmaciones.</p>';return;}
+      let total=0,html=`<div style="text-align:center;font-size:1.2rem;color:var(--vino);"><strong>📋 Confirmaciones: ${guestsData.length}</strong></div>`;
+      guestsData.forEach((g,i)=>{total+=1+(g.acompanantes||0);
+        html+=`<div style="border-bottom:1px solid #f0f0f0;padding:1rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+          <strong style="color:var(--vino);">${g.nombre}</strong><br>
+          <small style="color:#999;">${g.correo}</small><br>
+          <small>👥 ${g.acompanantes||0} acompañante(s) | 📅 ${new Date(g.fecha).toLocaleDateString('es-ES')}</small></div>
+          <button onclick="deleteGuest(${i})" style="background:#dc3545;color:#fff;border:none;padding:0.5rem 1rem;border-radius:5px;cursor:pointer;">Eliminar</button></div>`;
+      });
+      list.innerHTML=`<div style="margin-bottom:1rem;text-align:center;font-size:1.3rem;color:var(--vino);background:var(--beige);padding:1rem;border-radius:10px;">
+      <strong>👨‍👩‍👧‍👦 Total de personas: ${total}</strong></div>`+html;
+    }
+
+    function deleteGuest(i){if(!isLoggedIn)return;if(!confirm('¿Eliminar esta confirmación?'))return;
+      guestsData.splice(i,1);saveToLocalStorage();loadGuests();}
+
+    function clearAllGuests(){if(!isLoggedIn)return;if(!confirm('¿Eliminar TODAS las confirmaciones?'))return;
+      guestsData=[];saveToLocalStorage();loadGuests();alert('Confirmaciones eliminadas.');}
+
+    function exportGuests(){
+      if(!isLoggedIn)return;if(!guestsData.length){alert('No hay confirmaciones.');return;}
+      let csv='Nombre,Correo,Acompañantes,Fecha de Confirmación\n';
+      guestsData.forEach(g=>{csv+=`"${g.nombre}","${g.correo}",${g.acompanantes||0},"${new Date(g.fecha).toLocaleDateString('es-ES')}"\n`;});
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='confirmaciones_boda_margarita_harold.csv';a.click();
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      loadFromLocalStorage();
+      document.getElementById('rsvpForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const n=document.getElementById('nombre').value.trim();
+        const c=document.getElementById('correo').value.trim();
+        const a=parseInt(document.getElementById('acompanantes').value)||0;
+        if(!n||!c){alert('Por favor completa todos los campos.');return;}
+        const g={nombre:n,correo:c,acompanantes:a,fecha:new Date().toISOString()};
+        guestsData.push(g);saveToLocalStorage();
+        e.target.reset();
+        document.getElementById('successMessage').style.display='block';
+        setTimeout(()=>document.getElementById('successMessage').style.display='none',4000);
+        if(isLoggedIn)loadGuests();
+      });
+    });
   </script>
 </body>
 </html>
