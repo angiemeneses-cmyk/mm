@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nuestra Boda – Margarita y Harold</title>
   <link rel="icon" href="favicon.ico">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap');
 
@@ -113,6 +118,7 @@
   </style>
 </head>
 <body>
+  <!-- Hero Section -->
   <section class="hero">
     <h1>Margarita <span>&</span> Harold</h1>
     <p>"Más valen dos que uno, porque obtienen más fruto de su esfuerzo."<br><em>Eclesiastés 4:9</em></p>
@@ -140,27 +146,32 @@
   </footer>
 
   <script>
-    let guestsData = [];
+    // Configura tu Firebase
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://TU_PROJECT_ID.firebaseio.com",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_PROJECT_ID.appspot.com",
+      messagingSenderId: "TU_MESSAGING_SENDER_ID",
+      appId: "TU_APP_ID",
+      measurementId: "TU_MEASUREMENT_ID"
+    };
 
-    // Cargar confirmaciones desde localStorage
-    function loadFromLocalStorage() {
-      try {
-        const savedData = localStorage.getItem('wedding_guests');
-        guestsData = savedData ? JSON.parse(savedData) : [];
-      } catch (e) {
-        guestsData = [];
-      }
-    }
+    // Inicializa Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database(app);
 
-    // Guardar confirmaciones en localStorage
-    function saveToLocalStorage() {
-      localStorage.setItem('wedding_guests', JSON.stringify(guestsData));
+    // Función para guardar confirmaciones
+    function saveToFirebase(guestData) {
+      const guestsRef = database.ref('guests');
+      guestsRef.push(guestData);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadFromLocalStorage();
-
-      document.getElementById('rsvpForm').addEventListener('submit', (e) => {
+      // Captura el formulario y las confirmaciones
+      const form = document.getElementById('rsvpForm');
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const nombre = document.getElementById('nombre').value.trim();
@@ -179,11 +190,11 @@
           fecha: new Date().toISOString(),
         };
 
-        guestsData.push(guest);
-        saveToLocalStorage();
+        // Guardar en Firebase
+        saveToFirebase(guest);
 
         // Resetear el formulario
-        e.target.reset();
+        form.reset();
 
         // Mostrar mensaje de éxito
         document.getElementById('successMessage').style.display = 'block';
