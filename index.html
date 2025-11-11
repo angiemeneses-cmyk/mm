@@ -75,5 +75,124 @@
       border-radius:20px;
       padding:2rem;
       max-width:500px;
-      margi
+      margin:auto;
+      box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .form-input {
+      width:100%;
+      padding:1rem;
+      margin-bottom:1rem;
+      border:2px solid #f0f0f0;
+      border-radius:12px;
+      font-size:1rem;
+    }
+
+    .btn {
+      background:linear-gradient(135deg,var(--rosado),var(--vino));
+      color:#fff;
+      border:none;
+      padding:1rem 2rem;
+      border-radius:50px;
+      text-decoration:none;
+      font-size:1rem;
+      display:inline-block;
+      transition:all .3s ease;
+      box-shadow:0 5px 15px rgba(139,62,80,0.3);
+    }
+
+    .btn:hover { transform:scale(1.05); }
+
+    footer {
+      background:linear-gradient(135deg,var(--vino),#6d2f3f);
+      color:#fff;
+      text-align:center;
+      padding:3rem 1rem;
+    }
+    footer h3 { font-family:'Playfair Display',serif; font-size:2rem; margin:1rem 0; }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>Margarita <span>&</span> Harold</h1>
+    <p>"Más valen dos que uno, porque obtienen más fruto de su esfuerzo."<br><em>Eclesiastés 4:9</em></p>
+  </section>
+
+  <section class="form-section animate-in">
+    <h2>Confirma tu Asistencia</h2>
+    <div class="form-container">
+      <form id="rsvpForm">
+        <input type="text" id="nombre" placeholder="Tu nombre completo" required class="form-input">
+        <input type="text" id="alergias" placeholder="Intolerancias o alergias" class="form-input">
+        <input type="number" id="acompanantes" placeholder="Número de acompañantes" min="0" class="form-input">
+        <button type="submit" class="btn" style="width:100%;">Confirmar Asistencia</button>
+      </form>
+      <div id="successMessage" style="display:none;margin-top:1.5rem;padding:1rem;background:#d4edda;color:#155724;border-radius:10px;">
+        ¡Gracias por confirmar! Nos vemos el 15 de noviembre ❤️
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Con todo nuestro amor</p>
+    <h3>Margarita & Harold</h3>
+    <p>15 • Noviembre • 2025</p>
+  </footer>
+
+  <script>
+    let guestsData = [];
+
+    // Cargar confirmaciones desde localStorage
+    function loadFromLocalStorage() {
+      try {
+        const savedData = localStorage.getItem('wedding_guests');
+        guestsData = savedData ? JSON.parse(savedData) : [];
+      } catch (e) {
+        guestsData = [];
+      }
+    }
+
+    // Guardar confirmaciones en localStorage
+    function saveToLocalStorage() {
+      localStorage.setItem('wedding_guests', JSON.stringify(guestsData));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFromLocalStorage();
+
+      document.getElementById('rsvpForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById('nombre').value.trim();
+        const alergias = document.getElementById('alergias').value.trim();
+        const acompanantes = parseInt(document.getElementById('acompanantes').value) || 0;
+
+        if (!nombre) {
+          alert('Por favor completa tu nombre.');
+          return;
+        }
+
+        const guest = {
+          nombre,
+          alergias,
+          acompanantes,
+          fecha: new Date().toISOString(),
+        };
+
+        guestsData.push(guest);
+        saveToLocalStorage();
+
+        // Resetear el formulario
+        e.target.reset();
+
+        // Mostrar mensaje de éxito
+        document.getElementById('successMessage').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('successMessage').style.display = 'none';
+        }, 4000);
+      });
+    });
+  </script>
+</body>
+</html>
 
