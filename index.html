@@ -365,7 +365,7 @@
     async function loadFromStorage(){
       try{
         const keys = await window.storage.list('wedding_guest:', true);
-        if(!keys || !keys.keys) {
+        if(!keys || !keys.keys || keys.keys.length === 0) {
           guestsData = [];
           return;
         }
@@ -375,6 +375,7 @@
             const result = await window.storage.get(key, true);
             return result ? JSON.parse(result.value) : null;
           } catch(e) {
+            console.log('Error cargando:', key);
             return null;
           }
         });
@@ -382,7 +383,7 @@
         const results = await Promise.all(promises);
         guestsData = results.filter(g => g !== null);
       } catch(e) {
-        console.log('Inicializando almacenamiento...');
+        console.log('Inicializando almacenamiento:', e);
         guestsData = [];
       }
     }
@@ -391,8 +392,16 @@
     async function saveGuest(guest){
       try {
         const timestamp = Date.now();
-        const key = `wedding_guest:${timestamp}`;
-        await window.storage.set(key, JSON.stringify(guest), true);
+        const randomSuffix = Math.random().toString(36).substring(2, 7);
+        const key = `wedding_guest:${timestamp}_${randomSuffix}`;
+        
+        const result = await window.storage.set(key, JSON.stringify(guest), true);
+        
+        if(!result) {
+          console.error('Storage set returned null');
+          return false;
+        }
+        
         return true;
       } catch(e) {
         console.error('Error al guardar:', e);
@@ -527,23 +536,43 @@
     document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('rsvpForm').addEventListener('submit', async (e)=>{
         e.preventDefault();
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Guardando...';
+        submitBtn.disabled = true;
+        
         const n=document.getElementById('nombre').value.trim();
         const al=document.getElementById('alergias').value.trim();
         const ac=parseInt(document.getElementById('acompanantes').value)||0;
         
-        if(!n){alert('Por favor completa tu nombre.');return;}
+        if(!n){
+          alert('Por favor completa tu nombre.');
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          return;
+        }
         
         const g={nombre:n,alergias:al,acompanantes:ac,fecha:new Date().toISOString()};
         
-        const success = await saveGuest(g);
-        if(success) {
-          e.target.reset();
-          document.getElementById('successMessage').style.display='block';
-          setTimeout(()=>document.getElementById('successMessage').style.display='none',4000);
+        try {
+          const success = await saveGuest(g);
           
-          if(isLoggedIn) await loadGuests();
-        } else {
-          alert('Error al guardar la confirmación. Por favor intenta de nuevo.');
+          if(success) {
+            e.target.reset();
+            document.getElementById('successMessage').style.display='block';
+            setTimeout(()=>document.getElementById('successMessage').style.display='none',4000);
+            
+            if(isLoggedIn) await loadGuests();
+          } else {
+            alert('Error al guardar la confirmación. Por favor intenta de nuevo.');
+          }
+        } catch(error) {
+          console.error('Error completo:', error);
+          alert('Error al procesar la confirmación: ' + error.message);
+        } finally {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
         }
       });
     });
