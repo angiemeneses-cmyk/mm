@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nuestra Boda – Margarita y Harold</title>
   <link rel="icon" href="favicon.ico">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
-
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap');
 
@@ -47,7 +42,7 @@
         url('https://lh3.googleusercontent.com/d/1zrGO6S1SDDFuHkdeEMQA-BRkmM5TwgFO=s500');
       background-size: cover; 
       background-position: center; 
-      background-attachment: scroll; /* mejor para móviles */
+      background-attachment: scroll;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       text-align:center; color:#fff; position:relative; padding:2rem;
     }
@@ -74,6 +69,91 @@
       text-shadow:1px 1px 5px rgba(0,0,0,0.5);
     }
 
+    /* COUNTDOWN */
+    .countdown-section {
+      text-align:center;
+      padding:4rem 1rem;
+      background:linear-gradient(135deg,#fff 0%,var(--beige) 100%);
+    }
+
+     .countdown-box {
+      background:linear-gradient(135deg,var(--blanco),var(--rosa));
+      border-radius:50%; width:280px; height:280px; margin:4rem auto;
+      box-shadow:0 10px 40px rgba(139,62,80,0.15);
+      display:flex; align-items:center; justify-content:center; position:relative;
+      animation:pulse 3s ease-in-out infinite;
+    }
+
+    .countdown-values {
+      display:flex;
+      justify-content:center;
+      gap:1.5rem;
+      flex-wrap:wrap;
+    }
+    .countdown-values div { text-align:center; }
+    .countdown-values span:first-child {
+      font-size:2rem;
+      font-weight:700;
+      color:var(--vino);
+    }
+    .countdown-values span:last-child {
+      font-size:0.8rem;
+      text-transform:uppercase;
+      opacity:0.8;
+    }
+
+    h2 {
+      font-family:'Playfair Display',serif;
+      font-size:2.5rem;
+      color:var(--vino);
+      margin-bottom:2rem;
+      text-align:center;
+      position:relative;
+    }
+
+    section { padding:5rem 1.5rem; max-width:1100px; margin:auto; }
+
+    /* CÓDIGO DE VESTIMENTA */
+    .dress-icons {
+      display:flex;
+      justify-content:center;
+      gap:3rem;
+      flex-wrap:wrap;
+      margin:3rem 0;
+    }
+
+    .dress-icon { width:90px; height:90px; }
+    .dress-note { text-align:center; font-style:italic; color:var(--vino); font-size:1rem; margin-top:2rem; }
+    .hearts { text-align:center; color:var(--rosado); font-size:1.5rem; }
+
+    /* EVENTOS */
+    .event-card {
+      background:var(--blanco);
+      border-radius:20px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.08);
+      padding:2rem;
+      margin:1.5rem auto;
+      max-width:600px;
+      text-align:center;
+    }
+
+    .event-icon { width:70px; height:70px; margin-bottom:1rem; }
+
+    .btn {
+      background:linear-gradient(135deg,var(--rosado),var(--vino));
+      color:#fff;
+      border:none;
+      padding:1rem 2rem;
+      border-radius:50px;
+      text-decoration:none;
+      font-size:1rem;
+      display:inline-block;
+      transition:all .3s ease;
+      box-shadow:0 5px 15px rgba(139,62,80,0.3);
+    }
+
+    .btn:hover { transform:scale(1.05); }
+
     /* FORMULARIO */
     .form-container {
       background:white;
@@ -93,20 +173,31 @@
       font-size:1rem;
     }
 
-    .btn {
-      background:linear-gradient(135deg,var(--rosado),var(--vino));
-      color:#fff;
+    /* BOTONES FLOTANTES */
+    .music-btn, .admin-toggle-btn {
+      position:fixed;
+      bottom:1.2rem;
       border:none;
-      padding:1rem 2rem;
-      border-radius:50px;
-      text-decoration:none;
-      font-size:1rem;
-      display:inline-block;
-      transition:all .3s ease;
-      box-shadow:0 5px 15px rgba(139,62,80,0.3);
+      border-radius:50%;
+      width:55px;
+      height:55px;
+      font-size:1.3rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
     }
-
-    .btn:hover { transform:scale(1.05); }
+    .music-btn {
+      right:1.2rem;
+      background:linear-gradient(135deg,var(--rosado),var(--vino));
+      color:white;
+    }
+    .admin-toggle-btn {
+      left:1.2rem;
+      background:linear-gradient(135deg,#6c757d,#5a6268);
+      color:white;
+    }
 
     footer {
       background:linear-gradient(135deg,var(--vino),#6d2f3f);
@@ -115,13 +206,79 @@
       padding:3rem 1rem;
     }
     footer h3 { font-family:'Playfair Display',serif; font-size:2rem; margin:1rem 0; }
+
+    /* 📱 MÓVILES */
+    @media (max-width:480px){
+      .hero h1{font-size:2.5rem;}
+      .hero p{font-size:1rem;}
+      .countdown-box{width:220px;height:220px;}
+      .countdown-values span:first-child{font-size:1.6rem;}
+      section{padding:3.5rem 1rem;}
+      .btn{padding:0.9rem 1.6rem;font-size:0.9rem;}
+      .dress-icon{width:70px;height:70px;}
+    }
+
+    /* TABLET */
+    @media (max-width:768px){
+      .hero h1{font-size:3rem;}
+      .countdown-box{width:240px;height:240px;}
+    }
   </style>
 </head>
 <body>
-  <!-- Hero Section -->
   <section class="hero">
     <h1>Margarita <span>&</span> Harold</h1>
     <p>"Más valen dos que uno, porque obtienen más fruto de su esfuerzo."<br><em>Eclesiastés 4:9</em></p>
+  </section>
+
+  <section class="countdown-section animate-in">
+    <h2>Faltan</h2>
+    <div class="countdown-box">
+      <div class="countdown-time" id="countdown">
+        <div class="countdown-values">
+          <div><span>00</span><span>Días</span></div>
+          <div><span>00</span><span>Horas</span></div>
+          <div><span>00</span><span>Min</span></div>
+          <div><span>00</span><span>Seg</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dresscode-invitatis animate-in">
+    <h2>Código de vestimenta</h2>
+    <div class="dress-icons">
+      <div class="dress-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/2290/2290551.png" class="dress-icon" alt="Corbata">
+        <p><strong>Ellos:</strong> Formal</p>
+      </div>
+      <div class="dress-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/3994/3994081.png" class="dress-icon" alt="Vestido">
+        <p><strong>Ellas:</strong> Divinas</p>
+      </div>
+    </div>
+    <p class="dress-note">Nos reservamos el color blanco</p>
+    <div class="hearts">♡ ♡ ♡</div>
+  </section>
+
+  <section class="event-details">
+   <h2>Detalles del Evento</h2>
+   <div class="event-card">
+     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Ubicación ceremonia" class="event-icon">
+     <h3>Ceremonia</h3>
+     <p>15 de noviembre de 2025 - 10:00 a.m.</p>
+     <p>Parroquia Juan Pablo Segundo</p>
+     <p>Barrio Campamento, carrera 16 19N-25, Urb.</p>
+     <a href="https://maps.app.goo.gl/BkKQshBozQyhcEC46" class="btn" target="_blank">Ver en mapa</a>
+   </div>
+   <div class="event-card">
+     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Ubicación recepción" class="event-icon">
+     <h3>Recepción</h3>
+     <p>15 de noviembre de 2025 - 5:00 p.m.</p>
+     <p>Villa Guadalupe</p>
+     <p>Vereda Calibio</p>
+     <a href="https://maps.app.goo.gl/U9rPAX5uKHPMajzP8" class="btn" target="_blank">Ver en mapa</a>
+   </div>
   </section>
 
   <section class="form-section animate-in">
@@ -138,6 +295,34 @@
       </div>
     </div>
   </section>
+ <section class="admin-section animate-in" id="adminSection" style="background:#f8f8f8; padding:4rem 2rem; display:none;">
+    <h2>Panel de Administración</h2>
+    <div id="adminLogin" style="max-width:400px;margin:0 auto;">
+      <div style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+        <p style="text-align:center;margin-bottom:1.5rem;color:var(--gris);">Ingresa la contraseña para ver las confirmaciones</p>
+        <input type="password" id="adminPassword" placeholder="Contraseña" class="form-input">
+        <button onclick="checkPassword()" class="btn" style="width:100%;">🔐 Acceder</button>
+        <p id="loginError" style="color:#dc3545;text-align:center;margin-top:1rem;display:none;">Contraseña incorrecta</p>
+      </div>
+    </div>
+
+    <div id="adminContent" style="display:none;">
+      <div style="max-width:800px;margin:0 auto;">
+        <div style="text-align:right;margin-bottom:1rem;">
+          <button onclick="logout()" class="btn" style="background:linear-gradient(135deg,#6c757d,#5a6268);font-size:0.9rem;padding:0.6rem 1.5rem;">🚪 Cerrar sesión</button>
+        </div>
+        <div id="guestList" style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+          <p style="text-align:center;color:#999;">Cargando confirmaciones...</p>
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+          <button onclick="exportGuests()" class="btn" style="margin-right:1rem;">📥 Exportar Lista</button>
+          <button onclick="clearAllGuests()" class="btn" style="background:linear-gradient(135deg,#dc3545,#c82333);">🗑️ Limpiar Todo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <button class="admin-toggle-btn" onclick="toggleAdminSection()" title="Panel de administración">👤</button>
 
   <footer>
     <p>Con todo nuestro amor</p>
@@ -145,65 +330,223 @@
     <p>15 • Noviembre • 2025</p>
   </footer>
 
+  <button class="music-btn" id="musicBtn" onclick="toggleMusic()">♫</button>
+
+  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
-    // Configura tu Firebase
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://TU_PROJECT_ID.firebaseio.com",
-      projectId: "TU_PROJECT_ID",
-      storageBucket: "TU_PROJECT_ID.appspot.com",
-      messagingSenderId: "TU_MESSAGING_SENDER_ID",
-      appId: "TU_APP_ID",
-      measurementId: "TU_MEASUREMENT_ID"
-    };
+    const music=document.getElementById('bgMusic');
+    const btn=document.getElementById('musicBtn');
+    function toggleMusic(){ if(music.paused){music.play();btn.style.opacity='0.8';}else{music.pause();btn.style.opacity='1';}}
 
-    // Inicializa Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
+    const countdown=document.getElementById("countdown");
+    const target=new Date("Nov 15, 2025 10:00:00").getTime();
+    function pad(n){return n.toString().padStart(2,'0');}
+    setInterval(()=>{const now=new Date().getTime();const diff=target-now;
+      if(diff<0){countdown.innerHTML='<div><span>¡Hoy es el día!</span></div>';return;}
+      const d=Math.floor(diff/(1000*60*60*24));
+      const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+      const m=Math.floor((diff%(1000*60*60))/(1000*60));
+      const s=Math.floor((diff%(1000*60))/1000);
+      countdown.innerHTML=`<div class="countdown-values">
+        <div><span>${pad(d)}</span><span>Días</span></div>
+        <div><span>${pad(h)}</span><span>Horas</span></div>
+        <div><span>${pad(m)}</span><span>Min</span></div>
+        <div><span>${pad(s)}</span><span>Seg</span></div></div>`;},1000);
 
-    // Función para guardar confirmaciones
-    function saveToFirebase(guestData) {
-      const guestsRef = database.ref('guests');
-      guestsRef.push(guestData);
-    }
+    // ============= CONFIRMACIONES CON ALMACENAMIENTO COMPARTIDO =============
+    let isLoggedIn=false;
+    const ADMIN_PASSWORD='margarita2025';
+    let guestsData=[];
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Captura el formulario y las confirmaciones
-      const form = document.getElementById('rsvpForm');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const nombre = document.getElementById('nombre').value.trim();
-        const alergias = document.getElementById('alergias').value.trim();
-        const acompanantes = parseInt(document.getElementById('acompanantes').value) || 0;
-
-        if (!nombre) {
-          alert('Por favor completa tu nombre.');
+    // Cargar confirmaciones desde almacenamiento compartido
+    async function loadFromStorage(){
+      try{
+        const keys = await window.storage.list('wedding_guest:', true);
+        if(!keys || !keys.keys) {
+          guestsData = [];
           return;
         }
+        
+        const promises = keys.keys.map(async key => {
+          try {
+            const result = await window.storage.get(key, true);
+            return result ? JSON.parse(result.value) : null;
+          } catch(e) {
+            return null;
+          }
+        });
+        
+        const results = await Promise.all(promises);
+        guestsData = results.filter(g => g !== null);
+      } catch(e) {
+        console.log('Inicializando almacenamiento...');
+        guestsData = [];
+      }
+    }
 
-        const guest = {
-          nombre,
-          alergias,
-          acompanantes,
-          fecha: new Date().toISOString(),
-        };
+    // Guardar confirmación en almacenamiento compartido
+    async function saveGuest(guest){
+      try {
+        const timestamp = Date.now();
+        const key = `wedding_guest:${timestamp}`;
+        await window.storage.set(key, JSON.stringify(guest), true);
+        return true;
+      } catch(e) {
+        console.error('Error al guardar:', e);
+        return false;
+      }
+    }
 
-        // Guardar en Firebase
-        saveToFirebase(guest);
+    // Eliminar confirmación
+    async function deleteGuestByIndex(index){
+      try {
+        const keys = await window.storage.list('wedding_guest:', true);
+        if(!keys || !keys.keys || index >= keys.keys.length) return false;
+        
+        const keyToDelete = keys.keys[index];
+        await window.storage.delete(keyToDelete, true);
+        return true;
+      } catch(e) {
+        console.error('Error al eliminar:', e);
+        return false;
+      }
+    }
 
-        // Resetear el formulario
-        form.reset();
+    // Limpiar todas las confirmaciones
+    async function clearAllStorage(){
+      try {
+        const keys = await window.storage.list('wedding_guest:', true);
+        if(!keys || !keys.keys) return;
+        
+        for(const key of keys.keys) {
+          await window.storage.delete(key, true);
+        }
+      } catch(e) {
+        console.error('Error al limpiar:', e);
+      }
+    }
 
-        // Mostrar mensaje de éxito
-        document.getElementById('successMessage').style.display = 'block';
-        setTimeout(() => {
-          document.getElementById('successMessage').style.display = 'none';
-        }, 4000);
+    function toggleAdminSection(){
+      const s=document.getElementById('adminSection');
+      s.style.display=(s.style.display==='block'?'none':'block');
+      if(s.style.display==='block')s.scrollIntoView({behavior:'smooth'});
+    }
+
+    function checkPassword(){
+      const p=document.getElementById('adminPassword').value;
+      const e=document.getElementById('loginError');
+      if(p===ADMIN_PASSWORD){
+        isLoggedIn=true;
+        document.getElementById('adminLogin').style.display='none';
+        document.getElementById('adminContent').style.display='block';
+        e.style.display='none';
+        loadGuests();
+      }else{
+        e.style.display='block';
+        document.getElementById('adminPassword').value='';
+      }
+    }
+
+    function logout(){
+      isLoggedIn=false;
+      document.getElementById('adminLogin').style.display='block';
+      document.getElementById('adminContent').style.display='none';
+      document.getElementById('adminSection').style.display='none';
+    }
+
+    async function loadGuests(){
+      if(!isLoggedIn)return;
+      const list=document.getElementById('guestList');
+      list.innerHTML='<p style="text-align:center;color:#999;">Cargando confirmaciones...</p>';
+      
+      await loadFromStorage();
+      
+      if(!guestsData.length){
+        list.innerHTML='<p style="text-align:center;color:#999;">Aún no hay confirmaciones.</p>';
+        return;
+      }
+      
+      let total=0;
+      let html=`<div style="text-align:center;font-size:1.2rem;color:var(--vino);"><strong>📋 Confirmaciones: ${guestsData.length}</strong></div>`;
+      
+      guestsData.forEach((g,i)=>{
+        total+=1+(g.acompanantes||0);
+        html+=`<div style="border-bottom:1px solid #f0f0f0;padding:1rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+          <strong style="color:var(--vino);">${g.nombre}</strong><br>
+          <small style="color:#999;">${g.alergias || 'Sin alergias'}</small><br>
+          <small>👥 ${g.acompanantes||0} acompañante(s) | 📅 ${new Date(g.fecha).toLocaleDateString('es-ES')}</small></div>
+          <button onclick="deleteGuest(${i})" style="background:#dc3545;color:#fff;border:none;padding:0.5rem 1rem;border-radius:5px;cursor:pointer;">Eliminar</button></div>`;
+      });
+      
+      list.innerHTML=`<div style="margin-bottom:1rem;text-align:center;font-size:1.3rem;color:var(--vino);background:var(--beige);padding:1rem;border-radius:10px;">
+      <strong>👨‍👩‍👧‍👦 Total de personas: ${total}</strong></div>`+html;
+    }
+
+    async function deleteGuest(i){
+      if(!isLoggedIn)return;
+      if(!confirm('¿Eliminar esta confirmación?'))return;
+      
+      const success = await deleteGuestByIndex(i);
+      if(success) {
+        await loadGuests();
+      } else {
+        alert('Error al eliminar la confirmación');
+      }
+    }
+
+    async function clearAllGuests(){
+      if(!isLoggedIn)return;
+      if(!confirm('¿Eliminar TODAS las confirmaciones?'))return;
+      
+      await clearAllStorage();
+      guestsData=[];
+      loadGuests();
+      alert('Confirmaciones eliminadas.');
+    }
+
+    function exportGuests(){
+      if(!isLoggedIn)return;
+      if(!guestsData.length){alert('No hay confirmaciones.');return;}
+      
+      let csv='Nombre,Alergias,Acompañantes,Fecha de Confirmación\n';
+      guestsData.forEach(g=>{
+        csv+=`"${g.nombre}","${g.alergias||''}",${g.acompanantes||0},"${new Date(g.fecha).toLocaleDateString('es-ES')}"\n`;
+      });
+      
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='confirmaciones_boda_margarita_harold.csv';
+      a.click();
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.getElementById('rsvpForm').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const n=document.getElementById('nombre').value.trim();
+        const al=document.getElementById('alergias').value.trim();
+        const ac=parseInt(document.getElementById('acompanantes').value)||0;
+        
+        if(!n){alert('Por favor completa tu nombre.');return;}
+        
+        const g={nombre:n,alergias:al,acompanantes:ac,fecha:new Date().toISOString()};
+        
+        const success = await saveGuest(g);
+        if(success) {
+          e.target.reset();
+          document.getElementById('successMessage').style.display='block';
+          setTimeout(()=>document.getElementById('successMessage').style.display='none',4000);
+          
+          if(isLoggedIn) await loadGuests();
+        } else {
+          alert('Error al guardar la confirmación. Por favor intenta de nuevo.');
+        }
       });
     });
   </script>
 </body>
 </html>
-
