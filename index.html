@@ -26,20 +26,30 @@
       overflow-x: hidden;
     }
 
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
 
     .animate-in { animation: fadeInUp 1s ease-out forwards; opacity: 0; }
 
-    /* HERO */
+    /* HERO AJUSTADO PARA MÓVIL */
     .hero {
       min-height: 80vh;
       background: linear-gradient(rgba(139,62,80,0.4),rgba(0,0,0,0.4)), 
         url('https://lh3.googleusercontent.com/d/1zrGO6S1SDDFuHkdeEMQA-BRkmM5TwgFO=s500');
       background-size: cover; 
       background-position: center; 
+      background-attachment: scroll; /* mejor para móviles */
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       text-align:center; color:#fff; position:relative; padding:2rem;
+    }
+
+    .hero::before {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:300px;
+      background:linear-gradient(to bottom,transparent,var(--beige));
     }
 
     .hero h1 {
@@ -66,11 +76,11 @@
       background:linear-gradient(135deg,#fff 0%,var(--beige) 100%);
     }
 
-    .countdown-box {
+     .countdown-box {
       background:linear-gradient(135deg,var(--blanco),var(--rosa));
       border-radius:50%; width:280px; height:280px; margin:4rem auto;
       box-shadow:0 10px 40px rgba(139,62,80,0.15);
-      display:flex; align-items:center; justify-content:center;
+      display:flex; align-items:center; justify-content:center; position:relative;
       animation:pulse 3s ease-in-out infinite;
     }
 
@@ -98,6 +108,7 @@
       color:var(--vino);
       margin-bottom:2rem;
       text-align:center;
+      position:relative;
     }
 
     section { padding:5rem 1.5rem; max-width:1100px; margin:auto; }
@@ -112,7 +123,7 @@
     }
 
     .dress-icon { width:90px; height:90px; }
-    .dress-note { text-align:center; font-style:italic; color:var(--vino); margin-top:2rem; }
+    .dress-note { text-align:center; font-style:italic; color:var(--vino); font-size:1rem; margin-top:2rem; }
     .hearts { text-align:center; color:var(--rosado); font-size:1.5rem; }
 
     /* EVENTOS */
@@ -162,6 +173,32 @@
       font-size:1rem;
     }
 
+    /* BOTONES FLOTANTES */
+    .music-btn, .admin-toggle-btn {
+      position:fixed;
+      bottom:1.2rem;
+      border:none;
+      border-radius:50%;
+      width:55px;
+      height:55px;
+      font-size:1.3rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+    }
+    .music-btn {
+      right:1.2rem;
+      background:linear-gradient(135deg,var(--rosado),var(--vino));
+      color:white;
+    }
+    .admin-toggle-btn {
+      left:1.2rem;
+      background:linear-gradient(135deg,#6c757d,#5a6268);
+      color:white;
+    }
+
     footer {
       background:linear-gradient(135deg,var(--vino),#6d2f3f);
       color:#fff;
@@ -170,9 +207,21 @@
     }
     footer h3 { font-family:'Playfair Display',serif; font-size:2rem; margin:1rem 0; }
 
+    /* 📱 MÓVILES */
     @media (max-width:480px){
       .hero h1{font-size:2.5rem;}
+      .hero p{font-size:1rem;}
       .countdown-box{width:220px;height:220px;}
+      .countdown-values span:first-child{font-size:1.6rem;}
+      section{padding:3.5rem 1rem;}
+      .btn{padding:0.9rem 1.6rem;font-size:0.9rem;}
+      .dress-icon{width:70px;height:70px;}
+    }
+
+    /* TABLET */
+    @media (max-width:768px){
+      .hero h1{font-size:3rem;}
+      .countdown-box{width:240px;height:240px;}
     }
   </style>
 </head>
@@ -185,15 +234,28 @@
   <section class="countdown-section animate-in">
     <h2>Faltan</h2>
     <div class="countdown-box">
-      <div id="countdown"></div>
+      <div class="countdown-time" id="countdown">
+        <div class="countdown-values">
+          <div><span>00</span><span>Días</span></div>
+          <div><span>00</span><span>Horas</span></div>
+          <div><span>00</span><span>Min</span></div>
+          <div><span>00</span><span>Seg</span></div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="dresscode-invitatis animate-in">
     <h2>Código de vestimenta</h2>
     <div class="dress-icons">
-      <div><img src="https://cdn-icons-png.flaticon.com/512/2290/2290551.png" class="dress-icon"><p><strong>Ellos:</strong> Formal</p></div>
-      <div><img src="https://cdn-icons-png.flaticon.com/512/3994/3994081.png" class="dress-icon"><p><strong>Ellas:</strong> Divinas</p></div>
+      <div class="dress-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/2290/2290551.png" class="dress-icon" alt="Corbata">
+        <p><strong>Ellos:</strong> Formal</p>
+      </div>
+      <div class="dress-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/3994/3994081.png" class="dress-icon" alt="Vestido">
+        <p><strong>Ellas:</strong> Divinas</p>
+      </div>
     </div>
     <p class="dress-note">Nos reservamos el color blanco</p>
     <div class="hearts">♡ ♡ ♡</div>
@@ -202,17 +264,19 @@
   <section class="event-details">
    <h2>Detalles del Evento</h2>
    <div class="event-card">
-     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" class="event-icon">
+     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Ubicación ceremonia" class="event-icon">
      <h3>Ceremonia</h3>
      <p>15 de noviembre de 2025 - 10:00 a.m.</p>
      <p>Parroquia Juan Pablo Segundo</p>
+     <p>Barrio Campamento, carrera 16 19N-25, Urb.</p>
      <a href="https://maps.app.goo.gl/BkKQshBozQyhcEC46" class="btn" target="_blank">Ver en mapa</a>
    </div>
    <div class="event-card">
-     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" class="event-icon">
+     <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Ubicación recepción" class="event-icon">
      <h3>Recepción</h3>
      <p>15 de noviembre de 2025 - 5:00 p.m.</p>
-     <p>Villa Guadalupe, Vereda Calibio</p>
+     <p>Villa Guadalupe</p>
+     <p>Vereda Calibio</p>
      <a href="https://maps.app.goo.gl/U9rPAX5uKHPMajzP8" class="btn" target="_blank">Ver en mapa</a>
    </div>
   </section>
@@ -231,6 +295,34 @@
       </div>
     </div>
   </section>
+ <section class="admin-section animate-in" id="adminSection" style="background:#f8f8f8; padding:4rem 2rem; display:none;">
+    <h2>Panel de Administración</h2>
+    <div id="adminLogin" style="max-width:400px;margin:0 auto;">
+      <div style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+        <p style="text-align:center;margin-bottom:1.5rem;color:var(--gris);">Ingresa la contraseña para ver las confirmaciones</p>
+        <input type="password" id="adminPassword" placeholder="Contraseña" class="form-input">
+        <button onclick="checkPassword()" class="btn" style="width:100%;">🔐 Acceder</button>
+        <p id="loginError" style="color:#dc3545;text-align:center;margin-top:1rem;display:none;">Contraseña incorrecta</p>
+      </div>
+    </div>
+
+    <div id="adminContent" style="display:none;">
+      <div style="max-width:800px;margin:0 auto;">
+        <div style="text-align:right;margin-bottom:1rem;">
+          <button onclick="logout()" class="btn" style="background:linear-gradient(135deg,#6c757d,#5a6268);font-size:0.9rem;padding:0.6rem 1.5rem;">🚪 Cerrar sesión</button>
+        </div>
+        <div id="guestList" style="background:white;border-radius:15px;padding:2rem;box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+          <p style="text-align:center;color:#999;">Cargando confirmaciones...</p>
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+          <button onclick="exportGuests()" class="btn" style="margin-right:1rem;">📥 Exportar Lista</button>
+          <button onclick="clearAllGuests()" class="btn" style="background:linear-gradient(135deg,#dc3545,#c82333);">🗑️ Limpiar Todo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <button class="admin-toggle-btn" onclick="toggleAdminSection()" title="Panel de administración">👤</button>
 
   <footer>
     <p>Con todo nuestro amor</p>
@@ -238,49 +330,108 @@
     <p>15 • Noviembre • 2025</p>
   </footer>
 
-  <script>
-    // ===== CONFIGURA AQUÍ TU SCRIPT_URL =====
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw18QjijRJaANBuLicggQVIObJHj4BLjKQi-J6QedazftAJmW5RFXU7xdmvuVDxs8WXsQ/exec";
+  <button class="music-btn" id="musicBtn" onclick="toggleMusic()">♫</button>
 
-    // ===== CONTADOR =====
+  <!-- AUDIO ACTUALIZADO -->
+  <audio id="bgMusic" loop>
+    <source <iframe src="https://drive.google.com/file/d/1ekkfErA4VvsJLK3qNvFQyzZzYIhQPYXA/preview" width="640" height="480" allow="autoplay"></iframe>
+  </audio>
+
+  <script>
+    const music=document.getElementById('bgMusic');
+    const btn=document.getElementById('musicBtn');
+    function toggleMusic(){ if(music.paused){music.play();btn.style.opacity='0.8';}else{music.pause();btn.style.opacity='1';}}
+
     const countdown=document.getElementById("countdown");
     const target=new Date("Nov 15, 2025 10:00:00").getTime();
-    setInterval(()=>{
-      const now=new Date().getTime();
-      const diff=target-now;
+    function pad(n){return n.toString().padStart(2,'0');}
+    setInterval(()=>{const now=new Date().getTime();const diff=target-now;
       if(diff<0){countdown.innerHTML='<div><span>¡Hoy es el día!</span></div>';return;}
       const d=Math.floor(diff/(1000*60*60*24));
       const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
       const m=Math.floor((diff%(1000*60*60))/(1000*60));
       const s=Math.floor((diff%(1000*60))/1000);
       countdown.innerHTML=`<div class="countdown-values">
-        <div><span>${d}</span><span>Días</span></div>
-        <div><span>${h}</span><span>Horas</span></div>
-        <div><span>${m}</span><span>Min</span></div>
-        <div><span>${s}</span><span>Seg</span></div></div>`;
-    },1000);
+        <div><span>${pad(d)}</span><span>Días</span></div>
+        <div><span>${pad(h)}</span><span>Horas</span></div>
+        <div><span>${pad(m)}</span><span>Min</span></div>
+        <div><span>${pad(s)}</span><span>Seg</span></div></div>`;},1000);
 
-    // ===== ENVÍO A GOOGLE SHEETS =====
-    document.getElementById('rsvpForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      const nombre=document.getElementById('nombre').value.trim();
-      const alergias=document.getElementById('alergias').value.trim();
-      const acompanantes=parseInt(document.getElementById('acompanantes').value)||0;
+    // ============= CONFIRMACIONES =============
+    let isLoggedIn=false;
+    const ADMIN_PASSWORD='margarita2025';
+    let guestsData=[];
 
-      if(!nombre){alert('Por favor completa tu nombre.');return;}
+    function loadFromLocalStorage(){try{const s=localStorage.getItem('wedding_guests');guestsData=s?JSON.parse(s):[];}catch(e){guestsData=[];}}
+    function saveToLocalStorage(){localStorage.setItem('wedding_guests',JSON.stringify(guestsData));}
 
-      fetch(SCRIPT_URL, {
-        method:'POST',
-        body:JSON.stringify({nombre,alergias,acompanantes}),
-        headers:{'Content-Type':'application/json'}
-      })
-      .then(r=>r.text())
-      .then(res=>{
-        document.getElementById('successMessage').style.display='block';
+    function toggleAdminSection(){
+      const s=document.getElementById('adminSection');
+      s.style.display=(s.style.display==='block'?'none':'block');
+      if(s.style.display==='block')s.scrollIntoView({behavior:'smooth'});
+    }
+
+    function checkPassword(){
+      const p=document.getElementById('adminPassword').value;
+      const e=document.getElementById('loginError');
+      if(p===ADMIN_PASSWORD){isLoggedIn=true;
+        document.getElementById('adminLogin').style.display='none';
+        document.getElementById('adminContent').style.display='block';e.style.display='none';loadGuests();
+      }else{e.style.display='block';document.getElementById('adminPassword').value='';}
+    }
+
+    function logout(){isLoggedIn=false;
+      document.getElementById('adminLogin').style.display='block';
+      document.getElementById('adminContent').style.display='none';
+      document.getElementById('adminSection').style.display='none';
+    }
+
+    function loadGuests(){
+      if(!isLoggedIn)return;
+      const list=document.getElementById('guestList');
+      if(!guestsData.length){list.innerHTML='<p style="text-align:center;color:#999;">Aún no hay confirmaciones.</p>';return;}
+      let total=0,html=`<div style="text-align:center;font-size:1.2rem;color:var(--vino);"><strong>📋 Confirmaciones: ${guestsData.length}</strong></div>`;
+      guestsData.forEach((g,i)=>{total+=1+(g.acompanantes||0);
+        html+=`<div style="border-bottom:1px solid #f0f0f0;padding:1rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+          <strong style="color:var(--vino);">${g.nombre}</strong><br>
+          <small style="color:#999;">${g.correo}</small><br>
+          <small>👥 ${g.acompanantes||0} acompañante(s) | 📅 ${new Date(g.fecha).toLocaleDateString('es-ES')}</small></div>
+          <button onclick="deleteGuest(${i})" style="background:#dc3545;color:#fff;border:none;padding:0.5rem 1rem;border-radius:5px;cursor:pointer;">Eliminar</button></div>`;
+      });
+      list.innerHTML=`<div style="margin-bottom:1rem;text-align:center;font-size:1.3rem;color:var(--vino);background:var(--beige);padding:1rem;border-radius:10px;">
+      <strong>👨‍👩‍👧‍👦 Total de personas: ${total}</strong></div>`+html;
+    }
+
+    function deleteGuest(i){if(!isLoggedIn)return;if(!confirm('¿Eliminar esta confirmación?'))return;
+      guestsData.splice(i,1);saveToLocalStorage();loadGuests();}
+
+    function clearAllGuests(){if(!isLoggedIn)return;if(!confirm('¿Eliminar TODAS las confirmaciones?'))return;
+      guestsData=[];saveToLocalStorage();loadGuests();alert('Confirmaciones eliminadas.');}
+
+    function exportGuests(){
+      if(!isLoggedIn)return;if(!guestsData.length){alert('No hay confirmaciones.');return;}
+      let csv='Nombre,Alergias,Acompañantes,Fecha de Confirmación\n';
+      guestsData.forEach(g=>{csv+=`"${g.nombre}","${g.Alergias}",${g.acompanantes||0},"${new Date(g.fecha).toLocaleDateString('es-ES')}"\n`;});
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='confirmaciones_boda_margarita_harold.csv';a.click();
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      loadFromLocalStorage();
+      document.getElementById('rsvpForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const n=document.getElementById('nombre').value.trim();
+        const c=document.getElementById('Intolerancia/alergias')?document.getElementById('ntolerancia/alergias').value.trim():"";
+        const a=parseInt(document.getElementById('acompanantes').value)||0;
+        if(!n){alert('Por favor completa tu nombre.');return;}
+        const g={nombre:n,correo:c,acompanantes:a,fecha:new Date().toISOString()};
+        guestsData.push(g);saveToLocalStorage();
         e.target.reset();
+        document.getElementById('successMessage').style.display='block';
         setTimeout(()=>document.getElementById('successMessage').style.display='none',4000);
-      })
-      .catch(err=>alert('Error al enviar: '+err));
+        if(isLoggedIn)loadGuests();
+      });
     });
   </script>
 </body>
